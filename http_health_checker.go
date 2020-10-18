@@ -10,25 +10,25 @@ import (
 	"time"
 )
 
-type HttpHealthService struct {
+type HttpHealthChecker struct {
 	name    string
 	url     string
 	timeout time.Duration
 }
 
-func NewHttpHealthService(name, url string, timeout time.Duration) *HttpHealthService {
-	return &HttpHealthService{name, url, timeout}
+func NewHttpHealthChecker(name, url string, timeout time.Duration) *HttpHealthChecker {
+	return &HttpHealthChecker{name, url, timeout}
 }
 
-func NewDefaultHttpHealthService(name, url string) *HttpHealthService {
-	return &HttpHealthService{name, url, 5 * time.Second}
+func NewDefaultHttpHealthChecker(name, url string) *HttpHealthChecker {
+	return &HttpHealthChecker{name, url, 5 * time.Second}
 }
 
-func (s *HttpHealthService) Name() string {
+func (s *HttpHealthChecker) Name() string {
 	return s.name
 }
 
-func (s *HttpHealthService) Check(ctx context.Context) (map[string]interface{}, error) {
+func (s *HttpHealthChecker) Check(ctx context.Context) (map[string]interface{}, error) {
 	res := make(map[string]interface{})
 	client := http.Client{
 		Timeout: s.timeout,
@@ -51,7 +51,7 @@ func (s *HttpHealthService) Check(ctx context.Context) (map[string]interface{}, 
 	return res, nil
 }
 
-func (s *HttpHealthService) Build(ctx context.Context, data map[string]interface{}, err error) map[string]interface{} {
+func (s *HttpHealthChecker) Build(ctx context.Context, data map[string]interface{}, err error) map[string]interface{} {
 	if err == nil {
 		return data
 	}

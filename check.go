@@ -2,7 +2,7 @@ package health
 
 import "context"
 
-func Check(ctx context.Context, services []HealthService) Health {
+func Check(ctx context.Context, services []HealthChecker) Health {
 	health := Health{}
 	health.Status = StatusUp
 	healths := make(map[string]Health)
