@@ -16,12 +16,12 @@ type HttpHealthChecker struct {
 	timeout time.Duration
 }
 
-func NewHttpHealthChecker(name, url string, timeout time.Duration) *HttpHealthChecker {
+func NewHttpHealthCheckerWithTimeout(name, url string, timeout time.Duration) *HttpHealthChecker {
 	return &HttpHealthChecker{name, url, timeout}
 }
 
-func NewDefaultHttpHealthChecker(name, url string) *HttpHealthChecker {
-	return &HttpHealthChecker{name, url, 5 * time.Second}
+func NewHttpHealthChecker(name, url string) *HttpHealthChecker {
+	return &HttpHealthChecker{name, url, 4 * time.Second}
 }
 
 func (s *HttpHealthChecker) Name() string {
