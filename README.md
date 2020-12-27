@@ -1,9 +1,10 @@
 # Health
-- HealthService (no dependency)
+- HealthChecker (no dependency)
 - Health model
-- Build Health model from HealthService 
-- HttpHealthService
-- HealthController for http response
+- Build Health model from HealthChecker 
+- HttpHealthChecker
+- SqlHealthChecker (v1.0.4)
+- HealthHandler for http response
 
 ## Installation
 
@@ -24,7 +25,8 @@ You can optimize the import by version:
 - v0.0.2: Health Model
 - v0.0.3: Check
 - v0.0.8: Http Health Service
-- v1.1.1: HealthController for [gin](https://github.com/gin-gonic/gin) 
-- v1.1.3: HealthController for [echo v3](https://github.com/labstack/echo)
-- v1.1.4: HealthController for [echo v4](https://github.com/labstack/echo)
-- **v1.0.0: HealthController** (latest version)
+- v1.1.1: HealthHandler for [gin](https://github.com/gin-gonic/gin) 
+- v1.1.3: HealthHandler for [echo v3](https://github.com/labstack/echo)
+- v1.1.4: HealthHandler for [echo v4](https://github.com/labstack/echo)
+- **v1.0.3: HealthHandler**
+- **v1.0.4: HealthHandler and SqlHealthChecker** (latest version)
