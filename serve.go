@@ -36,6 +36,5 @@ func Serve(conf ServerConfig, handler *HealthHandler) {
 	}
 	http.HandleFunc("/health", handler.Check)
 	http.HandleFunc("/", handler.Check)
-	http.HandleFunc("", handler.Check)
 	http.ListenAndServe(server, nil)
 }
