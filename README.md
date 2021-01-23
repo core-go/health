@@ -29,4 +29,5 @@ You can optimize the import by version:
 - v1.1.3: HealthHandler for [echo v3](https://github.com/labstack/echo)
 - v1.1.4: HealthHandler for [echo v4](https://github.com/labstack/echo)
 - **v1.0.3: HealthHandler**
-- **v1.0.4: HealthHandler and SqlHealthChecker** (latest version)
+- **v1.0.4: HealthHandler and SqlHealthChecker**
+- **v1.0.6: HealthHandler, SqlHealthChecker and Serve(to start http server)**
