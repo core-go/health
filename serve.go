@@ -6,7 +6,7 @@ import (
 	"strconv"
 )
 
-type ServerConfig struct {
+type ServerConf struct {
 	Name       string `mapstructure:"name"`
 	Version    string `mapstructure:"version"`
 	Port       int64  `mapstructure:"port"`
@@ -16,7 +16,7 @@ type ServerConfig struct {
 	Secure     bool   `mapstructure:"secure"`
 }
 
-func Serve(conf ServerConfig, handler *HealthHandler) {
+func Serve(conf ServerConf, handler *HealthHandler) {
 	server := ""
 	if conf.Port > 0 {
 		server = ":" + strconv.FormatInt(conf.Port, 10)
