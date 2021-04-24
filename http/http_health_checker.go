@@ -1,4 +1,4 @@
-package health
+package http
 
 import (
 	"context"
@@ -16,7 +16,7 @@ type HttpHealthChecker struct {
 	timeout time.Duration
 }
 
-func NewHttpHealthChecker(name, url string, options ...time.Duration) *HttpHealthChecker {
+func NewHealthChecker(name, url string, options ...time.Duration) *HttpHealthChecker {
 	if len(options) >= 1 && options[0] > 0 {
 		return &HttpHealthChecker{name, url, options[0]}
 	} else {

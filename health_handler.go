@@ -10,8 +10,8 @@ type HealthHandler struct {
 	HealthCheckers []HealthChecker
 }
 
-func NewHealthHandler(healthCheckers []HealthChecker) *HealthHandler {
-	return &HealthHandler{healthCheckers}
+func NewHealthHandler(checkers ...HealthChecker) *HealthHandler {
+	return &HealthHandler{checkers}
 }
 
 func (c *HealthHandler) Check(w http.ResponseWriter, r *http.Request) {

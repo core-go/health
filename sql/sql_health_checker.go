@@ -1,4 +1,4 @@
-package health
+package sql
 
 import (
 	"context"
@@ -13,17 +13,23 @@ type SqlHealthChecker struct {
 	timeout time.Duration
 }
 
-func NewSqlHealthCheckerWithTimeout(db *sql.DB, name string, timeout time.Duration) *SqlHealthChecker {
+func NewSqlHealthChecker(db *sql.DB, name string, timeouts ...time.Duration) *SqlHealthChecker {
+	var timeout time.Duration
+	if len(timeouts) >= 1 {
+		timeout = timeouts[0]
+	} else {
+		timeout = 4 * time.Second
+	}
 	return &SqlHealthChecker{db, name, timeout}
 }
-func NewSqlHealthChecker(db *sql.DB, options ...string) *SqlHealthChecker {
+func NewHealthChecker(db *sql.DB, options ...string) *SqlHealthChecker {
 	var name string
 	if len(options) >= 1 && len(options[0]) > 0 {
 		name = options[0]
 	} else {
 		name = "sql"
 	}
-	return NewSqlHealthCheckerWithTimeout(db, name, 4 * time.Second)
+	return NewSqlHealthChecker(db, name, 4 * time.Second)
 }
 
 func (s *SqlHealthChecker) Name() string {
