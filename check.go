@@ -2,6 +2,11 @@ package health
 
 import "context"
 
+const (
+	StatusUp   = "UP"
+	StatusDown = "DOWN"
+)
+
 func Check(ctx context.Context, services []HealthChecker) Health {
 	health := Health{}
 	health.Status = StatusUp

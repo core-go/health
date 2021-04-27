@@ -7,16 +7,16 @@ import (
 )
 
 type HealthHandler struct {
-	HealthCheckers []HealthChecker
+	Checkers []HealthChecker
 }
 
 func NewHealthHandler(checkers ...HealthChecker) *HealthHandler {
-	return &HealthHandler{checkers}
+	return &HealthHandler{Checkers: checkers}
 }
 
 func (c *HealthHandler) Check(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
-	h := Check(ctx, c.HealthCheckers)
+	h := Check(ctx, c.Checkers)
 	bytes, err := json.Marshal(h)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
