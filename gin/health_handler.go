@@ -1,20 +1,20 @@
 package gin
 
 import (
-	"github.com/common-go/health"
+	"github.com/core-go/health"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-type GinHealthHandler struct {
+type HealthHandler struct {
 	HealthCheckers []health.HealthChecker
 }
 
-func NewGinHealthHandler(checkers ...health.HealthChecker) *GinHealthHandler {
-	return &GinHealthHandler{checkers}
+func NewHealthHandler(checkers ...health.HealthChecker) *HealthHandler {
+	return &HealthHandler{checkers}
 }
 
-func (c *GinHealthHandler) Check() gin.HandlerFunc {
+func (c *HealthHandler) Check() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		result := health.Check(ctx.Request.Context(), c.HealthCheckers)
 		if result.Status == health.StatusUp {
