@@ -16,7 +16,7 @@
 - [http client](https://github.com/core-go/health/blob/main/http/health_checker.go) health checker
 
 ### Database  
-- redis: support [go-redis/redis](https://github.com/core-go/health/blob/main/redis/health_checker.go) and [garyburd/redigo](https://github.com/core-go/health/blob/main/redigo/health_checker.go)
+- redis: support [go-redis/redis](https://github.com/core-go/health/blob/main/redis/health_checker.go), [go-redis/redis v8](https://github.com/core-go/health/blob/main/redis/v8/health_checker.go), and [garyburd/redigo](https://github.com/core-go/health/blob/main/redigo/health_checker.go)
 - [sql](https://github.com/core-go/health/blob/main/sql/health_checker.go)
 - [mongo](https://github.com/core-go/health/blob/main/mongo/health_checker.go)
 - [dynamodb](https://github.com/core-go/health/blob/main/dynamodb/health_checker.go)
