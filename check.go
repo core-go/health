@@ -14,24 +14,30 @@ func Check(ctx context.Context, services []HealthChecker) Health {
 	for _, service := range services {
 		sub := Health{}
 		c := context.Background()
-		data0, err := service.Check(c)
+		d0, err := service.Check(c)
 		if err == nil {
 			sub.Status = StatusUp
-			if len(data0) > 0 {
-				sub.Data = &data0
+			if d0 != nil && len(d0) > 0 {
+				sub.Data = d0
 			}
 		} else {
 			sub.Status = StatusDown
 			health.Status = StatusDown
-			data := service.Build(c, data0, err)
-			if len(data) > 0 {
-				sub.Data = &data
+			if d0 != nil {
+				data := service.Build(c, d0, err)
+				if data != nil && len(data) > 0 {
+					sub.Data = data
+				}
+			} else {
+				data := make(map[string]interface{}, 0)
+				data["error"] = err.Error()
+				sub.Data = data
 			}
 		}
 		healths[service.Name()] = sub
 	}
 	if len(healths) > 0 {
-		health.Details = &healths
+		health.Details = healths
 	}
 	return health
 }

@@ -1,4 +1,4 @@
-package gin
+package echo
 
 import (
 	"github.com/core-go/health"
