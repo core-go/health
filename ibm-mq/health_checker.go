@@ -11,10 +11,21 @@ type HealthChecker struct {
 	queueManager *ibmmq.MQQueueManager
 	topic        string
 	timeout      time.Duration
+	queue        *QueueConfig
+	auth         *MQAuth
 }
 
 var qObject ibmmq.MQObject
 
+func NewHealthCheckerByConfig(queue *QueueConfig, auth *MQAuth, topic string, options ...string) *HealthChecker {
+	var name string
+	if len(options) >= 1 {
+		name = options[0]
+	} else {
+		name = "ibmmq"
+	}
+	return NewIBMMQHealthCheckerByConfig(queue, auth, topic, name, 4*time.Second)
+}
 func NewHealthChecker(connection *ibmmq.MQQueueManager, topic string, options ...string) *HealthChecker {
 	var name string
 	if len(options) >= 1 {
@@ -22,17 +33,27 @@ func NewHealthChecker(connection *ibmmq.MQQueueManager, topic string, options ..
 	} else {
 		name = "ibmmq"
 	}
-	return NewIBMMQHealthChecker(connection, topic, name, 4*time.Second)
+	return NewHealthCheckerWithTimeout(connection, topic, name, 4*time.Second)
 }
 
-func NewIBMMQHealthChecker(connection *ibmmq.MQQueueManager, topic string, name string, timeouts ...time.Duration) *HealthChecker {
+func NewHealthCheckerWithTimeout(connection *ibmmq.MQQueueManager, topic string, name string, timeouts ...time.Duration) *HealthChecker {
 	var timeout time.Duration
 	if len(timeouts) >= 1 {
 		timeout = timeouts[0]
 	} else {
 		timeout = 4 * time.Second
 	}
-	return &HealthChecker{name, connection, topic, timeout}
+	return &HealthChecker{name: name, queueManager: connection, topic: topic, timeout: timeout}
+}
+
+func NewIBMMQHealthCheckerByConfig(queue *QueueConfig, auth *MQAuth, topic string, name string, timeouts ...time.Duration) *HealthChecker {
+	var timeout time.Duration
+	if len(timeouts) >= 1 {
+		timeout = timeouts[0]
+	} else {
+		timeout = 4 * time.Second
+	}
+	return &HealthChecker{name: name, queue: queue, auth: auth, topic: topic, timeout: timeout}
 }
 
 func (s *HealthChecker) Name() string {
@@ -41,6 +62,13 @@ func (s *HealthChecker) Name() string {
 
 func (s *HealthChecker) Check(ctx context.Context) (map[string]interface{}, error) {
 	res := make(map[string]interface{})
+	if s.queueManager == nil {
+		conn, err := newQueueManagerByConfig(*s.queue, *s.auth)
+		if err != nil {
+			return res, err
+		}
+		s.queueManager = conn
+	}
 	sd := ibmmq.NewMQSD()
 	sd.Options = ibmmq.MQSO_CREATE |
 		ibmmq.MQSO_NON_DURABLE |
@@ -62,7 +90,7 @@ func (s *HealthChecker) Build(ctx context.Context, data map[string]interface{}, 
 		return data
 	}
 	if data == nil {
-		data = make(map[string]interface{}, 0)
+		return make(map[string]interface{}, 0)
 	}
 	data["error"] = err.Error()
 	return data
