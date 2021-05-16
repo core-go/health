@@ -2,21 +2,23 @@ package rabbitmq
 
 import (
 	"context"
-	"github.com/streadway/amqp"
+	"time"
 )
 
-func NewChannel(url string) (*amqp.Channel, error) {
-	conn, err := amqp.Dial(url)
-	if err != nil {
-		return nil, err
-	}
-
-	return conn.Channel()
+type HealthChecker struct {
+	url     string
+	name    string
+	timeout time.Duration
 }
 
-type HealthChecker struct {
-	url  string
-	name string
+func NewHttpHealthChecker(name, url string, timeouts ...time.Duration) *HealthChecker {
+	var timeout time.Duration
+	if len(timeouts) >= 1 {
+		timeout = timeouts[0]
+	} else {
+		timeout = 4 * time.Second
+	}
+	return &HealthChecker{name: name, url: url, timeout: timeout}
 }
 
 func NewHealthChecker(url string, options ...string) *HealthChecker {
@@ -26,7 +28,7 @@ func NewHealthChecker(url string, options ...string) *HealthChecker {
 	} else {
 		name = "rabbitmq"
 	}
-	return &HealthChecker{url, name}
+	return NewHttpHealthChecker(name, url, 4*time.Second)
 }
 
 func (s *HealthChecker) Name() string {
@@ -35,7 +37,7 @@ func (s *HealthChecker) Name() string {
 
 func (s *HealthChecker) Check(ctx context.Context) (map[string]interface{}, error) {
 	res := make(map[string]interface{})
-	channel, er1 := NewChannel(s.url)
+	channel, er1 := NewChannelWithTimeOut(s.url, s.timeout)
 	if er1 != nil {
 		return res, er1
 	}
