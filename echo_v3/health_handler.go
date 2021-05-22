@@ -7,16 +7,16 @@ import (
 )
 
 type HealthHandler struct {
-	HealthCheckers []health.HealthChecker
+	Checkers []health.Checker
 }
 
-func NewHealthHandler(checkers ...health.HealthChecker) *HealthHandler {
+func NewHandler(checkers ...health.Checker) *HealthHandler {
 	return &HealthHandler{checkers}
 }
 
 func (c *HealthHandler) Check() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
-		result := health.Check(ctx.Request().Context(), c.HealthCheckers)
+		result := health.Check(ctx.Request().Context(), c.Checkers)
 		if result.Status == health.StatusUp {
 			return ctx.JSON(http.StatusOK, result)
 		} else {

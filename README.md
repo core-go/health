@@ -1,5 +1,5 @@
 # Health
-- [Health Checker](https://github.com/core-go/health/blob/main/health_checker.go)
+- [Checker](https://github.com/core-go/health/blob/main/checker.go)
 - [Health](https://github.com/core-go/health/blob/main/health.go) model
 - [Check](https://github.com/core-go/health/blob/main/check.go) to build Health model from HealthChecker
 
@@ -7,9 +7,9 @@
 - [Serve](https://github.com/core-go/health/blob/main/server/serve.go) to start a server, which is usually used for batch job (for example, message queue consumer)
 
 ### HTTP handler
-- [http handler](https://github.com/core-go/health/blob/main/health_handler.go)
-- [gin](https://github.com/gin-gonic/gin) [handler](https://github.com/core-go/health/blob/main/gin/health_handler.go)
-- [echo v4 handler](https://github.com/core-go/health/blob/main/echo/health_handler.go) and [echo v3 handler](https://github.com/core-go/health/blob/main/echo_v3/health_handler.go)
+- [handler](https://github.com/core-go/health/blob/main/handler.go)
+- [gin](https://github.com/gin-gonic/gin) [handler](https://github.com/core-go/health/blob/main/gin/handler.go)
+- [echo v4 handler](https://github.com/core-go/health/blob/main/echo/handler.go) and [echo v3 handler](https://github.com/core-go/health/blob/main/echo_v3/handler.go)
 
 ## Providers
 ### Common
