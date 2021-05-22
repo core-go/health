@@ -3,23 +3,11 @@ package elasticsearch
 import (
 	"context"
 	"github.com/elastic/go-elasticsearch"
-	"time"
 )
 
 type HealthChecker struct {
-	client  *elasticsearch.Client
-	name    string
-	timeout time.Duration
-}
-
-func NewElasticSearchHealthChecker(client *elasticsearch.Client, name string, timeouts ...time.Duration) *HealthChecker {
-	var timeout time.Duration
-	if len(timeouts) >= 1 {
-		timeout = timeouts[0]
-	} else {
-		timeout = 4 * time.Second
-	}
-	return &HealthChecker{client, name, timeout}
+	client *elasticsearch.Client
+	name   string
 }
 
 func NewHealthChecker(client *elasticsearch.Client, options ...string) *HealthChecker {
@@ -29,7 +17,7 @@ func NewHealthChecker(client *elasticsearch.Client, options ...string) *HealthCh
 	} else {
 		name = "elasticsearch"
 	}
-	return NewElasticSearchHealthChecker(client, name, 4 * time.Second)
+	return &HealthChecker{client, name}
 }
 
 func (e *HealthChecker) Name() string {

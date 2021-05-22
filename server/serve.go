@@ -34,12 +34,13 @@ func ServerInfo(conf ServerConf) string {
 		}
 	}
 }
-func Serve(conf ServerConf, check func(w http.ResponseWriter, r *http.Request)) {
+func Serve(conf ServerConf, check func(w http.ResponseWriter, r *http.Request)) error  {
 	log.Println(ServerInfo(conf))
 	http.HandleFunc("/health", check)
 	http.HandleFunc("/", check)
-	if err := http.ListenAndServe(Addr(conf.Port), nil); err != nil {
+	err := http.ListenAndServe(Addr(conf.Port), nil)
+	if err != nil {
 		log.Println(err.Error())
-		panic(err)
 	}
+	return err
 }
