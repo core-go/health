@@ -6,15 +6,15 @@ import (
 	"net/http"
 )
 
-type HealthHandler struct {
+type Handler struct {
 	Checkers []health.Checker
 }
 
-func NewHandler(checkers ...health.Checker) *HealthHandler {
-	return &HealthHandler{checkers}
+func NewHandler(checkers ...health.Checker) *Handler {
+	return &Handler{checkers}
 }
 
-func (c *HealthHandler) Check() echo.HandlerFunc {
+func (c *Handler) Check() echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		result := health.Check(ctx.Request().Context(), c.Checkers)
 		if result.Status == health.StatusUp {
