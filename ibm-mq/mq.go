@@ -1,6 +1,6 @@
 package ibmmq
 
-import "github.com/ibm-messaging/mq-golang/ibmmq"
+import "github.com/ibm-messaging/mq-golang/v5/ibmmq"
 
 type QueueConfig struct {
 	ManagerName    string      `mapstructure:"manager_name" json:"managerName,omitempty" gorm:"column:managername" bson:"managerName,omitempty" dynamodbav:"managerName,omitempty" firestore:"managerName,omitempty"`

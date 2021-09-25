@@ -14,13 +14,11 @@ func NewHandler(checkers ...health.Checker) *Handler {
 	return &Handler{checkers}
 }
 
-func (c *Handler) Check() echo.HandlerFunc {
-	return func(ctx echo.Context) error {
-		result := health.Check(ctx.Request().Context(), c.Checkers)
-		if result.Status == health.StatusUp {
-			return ctx.JSON(http.StatusOK, result)
-		} else {
-			return ctx.JSON(http.StatusInternalServerError, result)
-		}
+func (c *Handler) Check(ctx echo.Context) error {
+	result := health.Check(ctx.Request().Context(), c.Checkers)
+	if result.Status == health.StatusUp {
+		return ctx.JSON(http.StatusOK, result)
+	} else {
+		return ctx.JSON(http.StatusInternalServerError, result)
 	}
 }
