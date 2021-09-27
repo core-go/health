@@ -79,6 +79,7 @@ func (s *HealthChecker) Check(ctx context.Context) (map[string]interface{}, erro
 	if s.init == false {
 		var qObject ibmmq.MQObject
 		s.qObject = &qObject
+		s.init = true
 	}
 	subscriptionObject, err = s.queueManager.Sub(sd, s.qObject)
 
