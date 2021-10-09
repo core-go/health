@@ -14,7 +14,6 @@ type HealthChecker struct {
 	queue        *QueueConfig
 	auth         *MQAuth
 	qObject      *ibmmq.MQObject
-	init         bool
 }
 
 func NewHealthCheckerByConfig(queue *QueueConfig, auth *MQAuth, topic string, options ...string) *HealthChecker {
@@ -53,7 +52,7 @@ func NewIBMMQHealthCheckerByConfig(queue *QueueConfig, auth *MQAuth, topic strin
 	} else {
 		timeout = 4 * time.Second
 	}
-	return &HealthChecker{name: name, queue: queue, auth: auth, topic: topic, timeout: timeout, init: false}
+	return &HealthChecker{name: name, queue: queue, auth: auth, topic: topic, timeout: timeout}
 }
 
 func (s *HealthChecker) Name() string {
@@ -63,7 +62,7 @@ func (s *HealthChecker) Name() string {
 func (s *HealthChecker) Check(ctx context.Context) (map[string]interface{}, error) {
 	res := make(map[string]interface{})
 	if s.queueManager == nil {
-		conn, err := newQueueManagerByConfig(*s.queue, *s.auth)
+		conn, err := NewQueueManagerByConfig(*s.queue, *s.auth)
 		if err != nil {
 			return res, err
 		}
@@ -74,15 +73,11 @@ func (s *HealthChecker) Check(ctx context.Context) (map[string]interface{}, erro
 		ibmmq.MQSO_NON_DURABLE |
 		ibmmq.MQSO_MANAGED
 	sd.ObjectString = s.topic
-	var subscriptionObject ibmmq.MQObject
-	var err error
-	if s.init == false {
+	if s.qObject == nil {
 		var qObject ibmmq.MQObject
 		s.qObject = &qObject
-		s.init = true
 	}
-	subscriptionObject, err = s.queueManager.Sub(sd, s.qObject)
-
+	subscriptionObject, err := s.queueManager.Sub(sd, s.qObject)
 	if err != nil {
 		return res, err
 	}
