@@ -1,5 +1,5 @@
 # Health
-![health](https://camo.githubusercontent.com/563b71e07ce74a6457066dc41260addf5e131db81b0903a0250a59cbd7634ae5/68747470733a2f2f63646e2d696d616765732d312e6d656469756d2e636f6d2f6d61782f3830302f312a316b4645637876714d445a665457476d4a54454537672e706e67)
+![health](https://camo.githubusercontent.com/49287a63a0e1c52818c4321650b3f8cf2348d5f50108aed820cd6441fbb2574d/68747470733a2f2f63646e2d696d616765732d312e6d656469756d2e636f6d2f6d61782f3830302f312a6746457a416b7674666e51575665463265644b7767512e706e67)
 - [Checker](https://github.com/core-go/health/blob/main/checker.go)
 - [Health](https://github.com/core-go/health/blob/main/health.go) model
 - [Check](https://github.com/core-go/health/blob/main/check.go) to build Health model from HealthChecker
