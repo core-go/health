@@ -4,33 +4,33 @@ import (
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/x/bsonx"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"time"
 )
 
 type HealthChecker struct {
-	db      *mongo.Database
+	client  *mongo.Client
 	name    string
 	timeout time.Duration
 }
 
-func NewMongoHealthChecker(db *mongo.Database, name string, timeouts ...time.Duration) *HealthChecker {
+func NewMongoHealthChecker(client *mongo.Client, name string, timeouts ...time.Duration) *HealthChecker {
 	var timeout time.Duration
 	if len(timeouts) >= 1 {
 		timeout = timeouts[0]
 	} else {
 		timeout = 4 * time.Second
 	}
-	return &HealthChecker{db: db, name: name, timeout: timeout}
+	return &HealthChecker{client: client, name: name, timeout: timeout}
 }
-func NewHealthChecker(db *mongo.Database, options ...string) *HealthChecker {
+func NewHealthChecker(client *mongo.Client, options ...string) *HealthChecker {
 	var name string
 	if len(options) >= 1 && len(options[0]) > 0 {
 		name = options[0]
 	} else {
 		name = "mongo"
 	}
-	return NewMongoHealthChecker(db, name, 4 * time.Second)
+	return NewMongoHealthChecker(client, name, 4*time.Second)
 }
 
 func (s *HealthChecker) Name() string {
@@ -45,10 +45,9 @@ func (s *HealthChecker) Check(ctx context.Context) (map[string]interface{}, erro
 	defer cancel()
 
 	res := make(map[string]interface{})
-	info := make(map[string]interface{})
 	checkerChan := make(chan error)
 	go func() {
-		checkerChan <- s.db.RunCommand(ctx, bsonx.Doc{{"ping", bsonx.Int32(1)}}).Decode(&info)
+		checkerChan <- s.client.Ping(ctx, readpref.Primary())
 	}()
 	select {
 	case err := <-checkerChan:

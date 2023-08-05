@@ -3,8 +3,8 @@ package mongo
 import (
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/x/bsonx"
 	"time"
 )
 
@@ -24,7 +24,7 @@ func NewServerInfoChecker(db *mongo.Database, options ...string) *ServerInfoChec
 	} else {
 		name = "mongo"
 	}
-	return NewServerInfoCheckerWithTimeout(db, name, 4 * time.Second)
+	return NewServerInfoCheckerWithTimeout(db, name, 4*time.Second)
 }
 
 func (s *ServerInfoChecker) Name() string {
@@ -41,8 +41,9 @@ func (s *ServerInfoChecker) Check(ctx context.Context) (map[string]interface{}, 
 	res := make(map[string]interface{})
 	info := make(map[string]interface{})
 	checkerChan := make(chan error)
+	command := bson.D{{ "serverStatus", 1 }}
 	go func() {
-		checkerChan <- s.db.RunCommand(ctx, bsonx.Doc{{"serverStatus", bsonx.Int32(1)}}).Decode(&info)
+		checkerChan <- s.db.RunCommand(ctx, command).Decode(&info)
 	}()
 	select {
 	case err := <-checkerChan:
