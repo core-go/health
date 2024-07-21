@@ -55,7 +55,7 @@ A health check in microservices is a mechanism that ensures each service is func
 ## Implementation of [core-go/health](https://github.com/core-go/health)
 #### Core Library
 - <b>Purpose</b>: Provides basic health check functionalities
-- <b>Features:
+- <b>Features</b>:
   - Define standard health check interfaces.
     - Model [Health](https://github.com/core-go/health/blob/main/health.go)
       ```json
@@ -67,6 +67,7 @@ A health check in microservices is a mechanism that ensures each service is func
         Details map[string]Health      `json:"details,omitempty"`
       }
       ```
+
   - Allow custom health checks with this standard interface [Checker](https://github.com/core-go/health/blob/main/checker.go):
     ```json
     package health
@@ -79,8 +80,9 @@ A health check in microservices is a mechanism that ensures each service is func
       Build(ctx context.Context, data map[string]interface{}, err error) map[string]interface{}
     }
     ```
+
   - Build the response JSON from many custom health checks by this GO function [Check](https://github.com/core-go/health/blob/main/check.go)
-    - This function can be called by http handler ([gin](https://github.com/gin-gonic/gin), [echo](https://github.com/labstack/echo), [mux](https://github.com/gorilla/mux), [go-chi](https://github.com/go-chi/chi)) 
+    - This function can be called by http handler ([gin](https://github.com/gin-gonic/gin), [echo](https://github.com/labstack/echo), [mux](https://github.com/gorilla/mux), [go-chi](https://github.com/go-chi/chi))
   - Implement basic checks
     - CPU, memory, disk space: not yet implemented.
     - Cache (Redis, Memcached)
@@ -101,7 +103,7 @@ A health check in microservices is a mechanism that ensures each service is func
 - <b>Features</b>:
   - Check connectivity to cache servers (Redis, Memcached).
     - Redis: support [go-redis/redis](https://github.com/core-go/health/blob/main/redis/v9/health_checker.go) and [garyburd/redigo](https://github.com/core-go/health/blob/main/redigo/health_checker.go). The sample is at [go-admin](https://github.com/project-samples/go-admin).
-      - nodejs library for Redis is at [redis-plus](https://www.npmjs.com/package/redis-plus) 
+      - nodejs library for Redis is at [redis-plus](https://www.npmjs.com/package/redis-plus)
   - Validate cache hit/miss ratio and performance metrics.
 
 #### Database Health Check Library
@@ -114,7 +116,7 @@ A health check in microservices is a mechanism that ensures each service is func
       - nodejs library for Postgres is at [pg-extension](https://www.npmjs.com/package/pg-extension).
       - nodejs library for MS SQL is at [mssql-core](https://www.npmjs.com/package/mssql-core).
     - [mongo](https://github.com/core-go/health/blob/main/mongo/health_checker.go). The sample is at [go-mongo-sample](https://github.com/go-tutorials/go-mongo-sample).
-      - nodejs library for mongo is at [mongodb-extension](https://www.npmjs.com/package/mongodb-extension). The sample is at [mongo-modular-sample](https://github.com/source-code-template/mongo-modular-sample). 
+      - nodejs library for mongo is at [mongodb-extension](https://www.npmjs.com/package/mongodb-extension). The sample is at [mongo-modular-sample](https://github.com/source-code-template/mongo-modular-sample).
     - [dynamodb](https://github.com/core-go/health/blob/main/dynamodb/health_checker.go). The sample is at [go-dynamodb-tutorial](https://github.com/go-tutorials/go-dynamodb-tutorial).
     - [firestore](https://github.com/core-go/health/blob/main/firestore/health_checker.go). The sample is at [go-firestore-sample](https://github.com/go-tutorials/go-firestore-sample).
     - [elasticsearch](https://github.com/core-go/health/blob/main/elasticsearch/v8/health_checker.go). The sample is at [go-elasticsearch-sample](https://github.com/go-tutorials/go-elasticsearch-sample).
@@ -128,17 +130,17 @@ A health check in microservices is a mechanism that ensures each service is func
   - Check connectivity and queue depth for different message brokers.
     - [Amazon SQS](https://github.com/core-go/health/blob/main/sqs/health_checker.go). The sample is at [go-amazon-sqs-sample](https://github.com/project-samples/go-amazon-sqs-sample).
     - [Google Pub/Sub](https://github.com/core-go/health/blob/main/pubsub/health_checker.go). The sample is at [go-pubsub-sample](https://github.com/project-samples/go-pubsub-sample).
-      - health check for nodejs is at [google-pubsub](https://www.npmjs.com/package/google-pubsub). The sample is at [pubsub-sample](https://github.com/typescript-tutorial/pubsub-sample). 
+      - health check for nodejs is at [google-pubsub](https://www.npmjs.com/package/google-pubsub). The sample is at [pubsub-sample](https://github.com/typescript-tutorial/pubsub-sample).
     - [Kafka](https://github.com/core-go/health/blob/main/kafka/health_checker.go). The sample is at [go-kafka-sample](https://github.com/project-samples/go-kafka-sample).
-      - health check for nodejs is at [kafka-plus](https://www.npmjs.com/package/kafka-plus). The sample is at [kafka-sample](https://github.com/typescript-tutorial/kafka-sample). 
+      - health check for nodejs is at [kafka-plus](https://www.npmjs.com/package/kafka-plus). The sample is at [kafka-sample](https://github.com/typescript-tutorial/kafka-sample).
     - [NATS](https://github.com/core-go/health/blob/main/nats/health_checker.go). The sample is at [go-nats-sample](https://github.com/project-samples/go-nats-sample).
-      - health check for nodejs is at [NATS](https://www.npmjs.com/package/nats-plus). The sample is at [nats-sample](https://github.com/typescript-tutorial/nats-sample) 
+      - health check for nodejs is at [NATS](https://www.npmjs.com/package/nats-plus). The sample is at [nats-sample](https://github.com/typescript-tutorial/nats-sample)
     - [Active MQ](https://github.com/core-go/health/blob/main/activemq/health_checker.go). The sample is at [go-active-mq-sample](https://github.com/project-samples/go-active-mq-sample).
-      - health check for nodejs is at [activemq](https://www.npmjs.com/package/activemq). The sample is at [activemq-sample](https://github.com/typescript-tutorial/activemq-sample) 
+      - health check for nodejs is at [activemq](https://www.npmjs.com/package/activemq). The sample is at [activemq-sample](https://github.com/typescript-tutorial/activemq-sample)
     - [RabbitMQ](https://github.com/core-go/health/blob/main/rabbitmq/health_checker.go). The sample is at [go-rabbit-mq-sample](https://github.com/project-samples/go-rabbit-mq-sample).
       - health check for nodejs is at [rabbitmq-ext](https://www.npmjs.com/package/rabbitmq-ext). The sample is at [rabbitmq-sample](https://github.com/typescript-tutorial/rabbitmq-sample)
     - [IBM MQ](https://github.com/core-go/health/blob/main/ibmmq/health_checker.go). The sample is at [go-ibm-mq-sample](https://github.com/project-samples/go-ibm-mq-sample).
-      - health check for nodejs is at [ibmmq-plus](https://www.npmjs.com/package/ibmmq-plus). The sample is at [ibmmq-sample](https://github.com/typescript-tutorial/ibmmq-sample). 
+      - health check for nodejs is at [ibmmq-plus](https://www.npmjs.com/package/ibmmq-plus). The sample is at [ibmmq-sample](https://github.com/typescript-tutorial/ibmmq-sample).
   - Monitor message lag and processing time (Not yet implemented)
 
 ### Future Libraries to develop
@@ -163,7 +165,7 @@ A health check in microservices is a mechanism that ensures each service is func
   - [handler](https://github.com/core-go/health/blob/main/handler.go), to support [Gorilla mux](https://github.com/gorilla/mux) and [Go-chi](https://github.com/go-chi/chi). The sample is at [go-sql-sample](https://github.com/go-tutorials/go-sql-sample).
   - [echo handler](https://github.com/core-go/health/blob/main/echo/handler.go) to support [Echo](https://github.com/labstack/echo). The sample is at [go-sql-echo-sample](https://github.com/go-tutorials/go-sql-echo-sample).
   - [gin handler](https://github.com/core-go/health/blob/main/gin/handler.go) to support [Gin](https://github.com/gin-gonic/gin). The sample is at  is at [go-sql-gin-sample](https://github.com/go-tutorials/go-sql-gin-sample).
-    - for nodejs, we have [express-ext](https://www.npmjs.com/package/express-ext) to integrate with [express](https://www.npmjs.com/package/express). The sample is at  is at [mongo-modular-sample](https://github.com/source-code-template/mongo-modular-sample).  
+    - for nodejs, we have [express-ext](https://www.npmjs.com/package/express-ext) to integrate with [express](https://www.npmjs.com/package/express). The sample is at  is at [mongo-modular-sample](https://github.com/source-code-template/mongo-modular-sample).
 
 ## Installation
 Please make sure to initialize a Go module before installing core-go/health:
