@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-type ServerConf struct {
+type ServerConfig struct {
 	AppId             string         `yaml:"app_id" mapstructure:"app_id" json:"appId,omitempty" gorm:"column:appid" bson:"appId,omitempty" dynamodbav:"appId,omitempty" firestore:"appId,omitempty"`
 	Name              string         `yaml:"name" mapstructure:"name" json:"name,omitempty" gorm:"column:name" bson:"name,omitempty" dynamodbav:"name,omitempty" firestore:"name,omitempty"`
 	Version           string         `yaml:"version" mapstructure:"version" json:"version,omitempty" gorm:"column:version" bson:"version,omitempty" dynamodbav:"version,omitempty" firestore:"version,omitempty"`
@@ -33,7 +33,7 @@ func Addr(port *int64) string {
 	}
 	return server
 }
-func ServerInfo(conf ServerConf) string {
+func ServerInfo(conf ServerConfig) string {
 	if len(conf.Version) > 0 {
 		if conf.Port != nil && *conf.Port >= 0 {
 			return "Start service: " + conf.Name + " at port " + strconv.FormatInt(*conf.Port, 10) + " with version " + conf.Version
@@ -48,7 +48,7 @@ func ServerInfo(conf ServerConf) string {
 		}
 	}
 }
-func Serve(conf ServerConf, check func(w http.ResponseWriter, r *http.Request), options ...*tls.Config) {
+func Serve(conf ServerConfig, check func(w http.ResponseWriter, r *http.Request), options ...*tls.Config) {
 	log.Println(ServerInfo(conf))
 	http.HandleFunc("/health", check)
 	http.HandleFunc("/", check)
@@ -59,7 +59,7 @@ func Serve(conf ServerConf, check func(w http.ResponseWriter, r *http.Request), 
 		panic(err)
 	}
 }
-func CreateServer(conf ServerConf, handler http.Handler, options ...*tls.Config) *http.Server {
+func CreateServer(conf ServerConfig, handler http.Handler, options ...*tls.Config) *http.Server {
 	addr := Addr(conf.Port)
 	srv := http.Server{
 		Addr:      addr,
@@ -78,7 +78,7 @@ func CreateServer(conf ServerConf, handler http.Handler, options ...*tls.Config)
 	if conf.WriteTimeout != nil {
 		srv.WriteTimeout = *conf.WriteTimeout
 	}
-	if conf.IdleTimeout != nil  {
+	if conf.IdleTimeout != nil {
 		srv.IdleTimeout = *conf.IdleTimeout
 	}
 	if conf.MaxHeaderBytes != nil && *conf.MaxHeaderBytes > 0 {
