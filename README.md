@@ -48,6 +48,12 @@ A health check in microservices is a mechanism that ensures each service is func
     }
   }
   ```
+#### Health Status
+- UP: Indicates that the application is functioning normally and all health checks have passed.
+- DOWN: Indicates that the application is experiencing issues, and one or more health checks have failed.
+- OUT_OF_SERVICE: Indicates that the application is temporarily out of service, typically during startup or shutdown.
+- UNKNOWN: Indicates that the health status is unknown or could not be determined.
+
 ## Implementation of [core-go/health](https://github.com/core-go/health)
 #### Core Library
 - <b>Purpose</b>: Provides basic health check functionalities

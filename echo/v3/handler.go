@@ -1,4 +1,4 @@
-package echo
+package v3
 
 import (
 	"github.com/core-go/health"
