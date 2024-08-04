@@ -2,6 +2,9 @@
 ### Health Check Definition
 A health check in microservices is a mechanism that ensures each service is functioning correctly and is available. It typically involves periodically checking the status of various components of a service and reporting their health.
 
+- You can refer to [Microservice Health Check](https://www.linkedin.com/pulse/microservice-health-check-go-nodejs-duc-nguyen-qunvc) at my [Linked In](https://vn.linkedin.com/in/duc-nguyen-437240239?trk=article-ssr-frontend-pulse_publisher-author-card) for more details.
+
+
 ![health](https://cdn-images-1.medium.com/max/800/1*wiWnkgzUoSgJT9QUXfzI8A.png)
 
 ### Use Cases of Health Check
@@ -154,7 +157,7 @@ type Checker interface {
 - Designed to integrate seamlessly with existing Go libraries: [Gorilla mux](https://github.com/gorilla/mux), [Go-chi](https://github.com/go-chi/chi), [Echo](https://github.com/labstack/echo) and [Gin](https://github.com/gin-gonic/gin).
   - [handler](https://github.com/core-go/health/blob/main/handler.go), to support [Gorilla mux](https://github.com/gorilla/mux) and [Go-chi](https://github.com/go-chi/chi). The sample is at [go-sql-sample](https://github.com/go-tutorials/go-sql-sample).
   - [echo handler](https://github.com/core-go/health/blob/main/echo/handler.go) to support [Echo](https://github.com/labstack/echo). The sample is at [go-sql-echo-sample](https://github.com/go-tutorials/go-sql-echo-sample).
-  - [gin handler](https://github.com/core-go/health/blob/main/gin/handler.go) to support [Gin](https://github.com/gin-gonic/gin). The sample is at  is at [go-sql-gin-sample](https://github.com/go-tutorials/go-sql-gin-sample).
+  - [gin handler](https://github.com/core-go/health/blob/main/gin/handler.go) to support [Gin](https://github.com/gin-gonic/gin). The sample is at [go-sql-gin-sample](https://github.com/go-tutorials/go-sql-gin-sample).
 
 ### Benefits and Challenges:
 #### Benefits:
