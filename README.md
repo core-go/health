@@ -5,7 +5,7 @@ A health check in microservices is a mechanism that ensures each service is func
 - You can refer to [Microservice Health Check](https://www.linkedin.com/pulse/microservice-health-check-go-nodejs-duc-nguyen-qunvc) at my [Linked In](https://vn.linkedin.com/in/duc-nguyen-437240239?trk=article-ssr-frontend-pulse_publisher-author-card) for more details.
 
 
-![health](https://cdn-images-1.medium.com/max/800/1*wiWnkgzUoSgJT9QUXfzI8A.png)
+![health](https://cdn-images-1.medium.com/max/800/1*k-VjYL3UL9Zohwzas4nb8Q.png)
 
 ### Use Cases of Health Check
 #### Service Availability Monitoring:
