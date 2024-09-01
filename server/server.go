@@ -9,14 +9,9 @@ import (
 )
 
 type ServerConfig struct {
-	AppId             string         `yaml:"app_id" mapstructure:"app_id" json:"appId,omitempty" gorm:"column:appid" bson:"appId,omitempty" dynamodbav:"appId,omitempty" firestore:"appId,omitempty"`
 	Name              string         `yaml:"name" mapstructure:"name" json:"name,omitempty" gorm:"column:name" bson:"name,omitempty" dynamodbav:"name,omitempty" firestore:"name,omitempty"`
 	Version           string         `yaml:"version" mapstructure:"version" json:"version,omitempty" gorm:"column:version" bson:"version,omitempty" dynamodbav:"version,omitempty" firestore:"version,omitempty"`
 	Port              *int64         `yaml:"port" mapstructure:"port" json:"port,omitempty" gorm:"column:port" bson:"port,omitempty" dynamodbav:"port,omitempty" firestore:"port,omitempty"`
-	Secure            bool           `yaml:"secure" mapstructure:"secure" json:"secure,omitempty" gorm:"column:secure" bson:"secure,omitempty" dynamodbav:"secure,omitempty" firestore:"secure,omitempty"`
-	Log               *bool          `yaml:"log" mapstructure:"log" json:"log,omitempty" gorm:"column:log" bson:"log,omitempty" dynamodbav:"log,omitempty" firestore:"log,omitempty"`
-	Monitor           *bool          `yaml:"monitor" mapstructure:"monitor" json:"monitor,omitempty" gorm:"column:monitor" bson:"monitor,omitempty" dynamodbav:"monitor,omitempty" firestore:"monitor,omitempty"`
-	CORS              *bool          `yaml:"cors" mapstructure:"cors" json:"cors,omitempty" gorm:"column:cors" bson:"cors,omitempty" dynamodbav:"cors,omitempty" firestore:"cors,omitempty"`
 	WriteTimeout      *time.Duration `yaml:"write_timeout" mapstructure:"write_timeout" json:"writeTimeout,omitempty" gorm:"column:writetimeout" bson:"writeTimeout,omitempty" dynamodbav:"writeTimeout,omitempty" firestore:"writeTimeout,omitempty"`
 	ReadTimeout       *time.Duration `yaml:"read_timeout" mapstructure:"read_timeout" json:"readTimeout,omitempty" gorm:"column:readtimeout" bson:"readTimeout,omitempty" dynamodbav:"readTimeout,omitempty" firestore:"readTimeout,omitempty"`
 	ReadHeaderTimeout *time.Duration `yaml:"read_header_timeout" mapstructure:"read_header_timeout" json:"readHeaderTimeout,omitempty" gorm:"column:readheadertimeout" bson:"readHeaderTimeout,omitempty" dynamodbav:"readHeaderTimeout,omitempty" firestore:"readHeaderTimeout,omitempty"`
@@ -33,34 +28,34 @@ func Addr(port *int64) string {
 	}
 	return server
 }
-func ServerInfo(conf ServerConfig) string {
-	if len(conf.Version) > 0 {
-		if conf.Port != nil && *conf.Port >= 0 {
-			return "Start service: " + conf.Name + " at port " + strconv.FormatInt(*conf.Port, 10) + " with version " + conf.Version
+func ServerInfo(cfg ServerConfig) string {
+	if len(cfg.Version) > 0 {
+		if cfg.Port != nil && *cfg.Port >= 0 {
+			return "Start service: " + cfg.Name + " at port " + strconv.FormatInt(*cfg.Port, 10) + " with version " + cfg.Version
 		} else {
-			return "Start service: " + conf.Name + " with version " + conf.Version
+			return "Start service: " + cfg.Name + " with version " + cfg.Version
 		}
 	} else {
-		if conf.Port != nil && *conf.Port >= 0 {
-			return "Start service: " + conf.Name + " at port " + strconv.FormatInt(*conf.Port, 10)
+		if cfg.Port != nil && *cfg.Port >= 0 {
+			return "Start service: " + cfg.Name + " at port " + strconv.FormatInt(*cfg.Port, 10)
 		} else {
-			return "Start service: " + conf.Name
+			return "Start service: " + cfg.Name
 		}
 	}
 }
-func Serve(conf ServerConfig, check func(w http.ResponseWriter, r *http.Request), options ...*tls.Config) {
-	log.Println(ServerInfo(conf))
+func Serve(cfg ServerConfig, check func(w http.ResponseWriter, r *http.Request), options ...*tls.Config) {
+	log.Println(ServerInfo(cfg))
 	http.HandleFunc("/health", check)
 	http.HandleFunc("/", check)
-	srv := CreateServer(conf, nil, options...)
+	srv := CreateServer(cfg, nil, options...)
 	err := srv.ListenAndServe()
 	if err != nil {
 		log.Println(err.Error())
 		panic(err)
 	}
 }
-func CreateServer(conf ServerConfig, handler http.Handler, options ...*tls.Config) *http.Server {
-	addr := Addr(conf.Port)
+func CreateServer(cfg ServerConfig, handler http.Handler, options ...*tls.Config) *http.Server {
+	addr := Addr(cfg.Port)
 	srv := http.Server{
 		Addr:      addr,
 		Handler:   nil,
@@ -69,20 +64,20 @@ func CreateServer(conf ServerConfig, handler http.Handler, options ...*tls.Confi
 	if len(options) > 0 && options[0] != nil {
 		srv.TLSConfig = options[0]
 	}
-	if conf.ReadTimeout != nil {
-		srv.ReadTimeout = *conf.ReadTimeout
+	if cfg.ReadTimeout != nil {
+		srv.ReadTimeout = *cfg.ReadTimeout
 	}
-	if conf.ReadHeaderTimeout != nil {
-		srv.ReadHeaderTimeout = *conf.ReadHeaderTimeout
+	if cfg.ReadHeaderTimeout != nil {
+		srv.ReadHeaderTimeout = *cfg.ReadHeaderTimeout
 	}
-	if conf.WriteTimeout != nil {
-		srv.WriteTimeout = *conf.WriteTimeout
+	if cfg.WriteTimeout != nil {
+		srv.WriteTimeout = *cfg.WriteTimeout
 	}
-	if conf.IdleTimeout != nil {
-		srv.IdleTimeout = *conf.IdleTimeout
+	if cfg.IdleTimeout != nil {
+		srv.IdleTimeout = *cfg.IdleTimeout
 	}
-	if conf.MaxHeaderBytes != nil && *conf.MaxHeaderBytes > 0 {
-		srv.MaxHeaderBytes = *conf.MaxHeaderBytes
+	if cfg.MaxHeaderBytes != nil && *cfg.MaxHeaderBytes > 0 {
+		srv.MaxHeaderBytes = *cfg.MaxHeaderBytes
 	}
 	srv.Handler = handler
 	return &srv
