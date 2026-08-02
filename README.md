@@ -1,98 +1,373 @@
 # Health Check in Microservices
-### Health Check Definition
-A health check in microservices is a mechanism that ensures each service is functioning correctly and is available. It typically involves periodically checking the status of various components of a service and reporting their health.
+
+> A lightweight, framework-independent health check framework for Go microservices.
+
+Most health endpoints only answer one question:
+
+> **"Is my HTTP server running?"**
+
+Production systems need a much more important answer:
+
+- Is the database reachable?
+- Is Kafka connected?
+- Is RabbitMQ available?
+- Is Elasticsearch healthy?
+- Is the external HTTP service responding?
+- Can this service actually perform its job?
+
+[**core-go/health**](https://www.linkedin.com/pulse/microservice-health-check-go-nodejs-duc-nguyen-qunvc) provides a simple, extensible, and production-ready way to monitor the health of your application's critical dependencies.
 
 - You can refer to [Microservice Health Check](https://www.linkedin.com/pulse/microservice-health-check-go-nodejs-duc-nguyen-qunvc) at my [Linked In](https://vn.linkedin.com/in/duc-nguyen-437240239?trk=article-ssr-frontend-pulse_publisher-author-card) for more details.
 
-
 ![health](https://cdn-images-1.medium.com/max/800/1*NreJfea6tHobxMpiq96PPQ.png)
 
-### Use Cases of Health Check
-#### Service Availability Monitoring:
-- <b>Scenario</b>: Ensuring that each microservice is up and running.
-- <b>Benefit</b>: Helps in quickly identifying and addressing service outages.
-#### Dependency Checking
-- <b>Scenario</b>: Verifying that all dependencies of a service are available and functioning.
-- <b>Benefit</b>: Ensures the entire application stack is healthy and operational.
-#### Deployment Validation
-- <b>Scenario</b>: Checking the health of services post-deployment to ensure they are functioning as expected.
-- <b>Benefit</b>: Detects deployment issues early, preventing faulty services from affecting the system.
-#### Load Balancing
-- <b>Scenario</b>: Directing traffic only to healthy instances of a service.
-- <b>Benefit</b>: Ensures reliable service delivery by avoiding unhealthy instances.
-#### Auto-scaling
-- <b>Scenario</b>: Scaling up or down based on the health and load of the services.
-- <b>Benefit</b>: Optimizes resource usage and cost efficiency.
 
-### Implementation
-#### Tools
-- Spring Boot Actuator, AWS Elastic Load Balancer, Kubernetes liveness and readiness probes
-#### Endpoints:
-- Health check endpoints (e.g., /health, /status) that return the health status of the service.
-#### API Design:
-- Request: GET /health
-- Response:
-  ```json
-  {
-    "status": "DOWN",
-    "details": {
-      "sql": {
-        "status": "DOWN",
-        "data": {
-          "error": "pq: database 'demo' does not exist"
-        }
-      },
-      "firestore": {
-        "status": "UP"
-      },
-      "kafka": {
-        "status": "UP"
-      }
-    }
-  }
-  ```
-#### Health Status
-- <b>UP</b>: Indicates that the application is functioning normally and all health checks have passed.
-- <b>DOWN</b>: Indicates that the application is experiencing issues, and one or more health checks have failed.
+---
 
-## Implementation of [core-go/health](https://github.com/core-go/health)
-#### Core Library
-- <b>Purpose</b>: Provides basic health check functionalities
-- <b>Features</b>:
-  - Define standard health check interfaces.
-    - Model [Health](https://github.com/core-go/health/blob/main/health.go)
-      ```go
-      package health
+# Why?
 
-      type Health struct {
-        Status  string                 `json:"status,omitempty"`
-        Data    map[string]interface{} `json:"data,omitempty"`
-        Details map[string]Health      `json:"details,omitempty"`
-      }
-      ```
+Many Go applications expose a health endpoint like this:
 
-  - Allow custom health checks with this standard interface [Checker](https://github.com/core-go/health/blob/main/checker.go):
 ```go
-package health
+http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+    w.WriteHeader(http.StatusOK)
+})
+```
 
-import "context"
+This only indicates that the HTTP server is alive.
 
-type Checker interface {
-  Name() string
-  Check(ctx context.Context) (map[string]interface{}, error)
-  Build(ctx context.Context, data map[string]interface{}, err error) map[string]interface{}
+Imagine a microservice that depends on:
+
+- Oracle
+- Kafka
+- Redis
+- Elasticsearch
+- External HTTP APIs
+
+If Kafka becomes unavailable:
+
+- the HTTP server is still running
+- `/health` still returns **200 OK**
+- Kubernetes considers the pod healthy
+- users begin experiencing failures
+- engineers spend valuable time finding the root cause
+
+With **core-go/health**, the health endpoint immediately reports that **Kafka is DOWN**, allowing your monitoring platform to notify the correct team before users report problems.
+
+---
+
+# Features
+
+- Lightweight
+- Framework independent
+- Production-ready
+- Kubernetes ready
+- Built-in providers for common infrastructure
+- Per-provider configurable timeout
+- Ready-to-use HTTP handlers
+- Pluggable provider architecture
+- Easy to extend with custom providers
+- Zero dependency on any web framework
+
+---
+
+# Supported Providers
+
+Built-in providers include:
+
+### Databases
+
+- SQL Database
+- PostgreSQL
+- MySQL
+- Oracle
+- SQL Server
+- MongoDB
+- Firestore
+
+### Search
+
+- Elasticsearch
+
+### Cache
+
+- Redis
+
+### Message Brokers
+
+- Kafka
+- RabbitMQ
+- IBM MQ
+- ActiveMQ
+- NATS
+
+### HTTP
+
+- HTTP Client
+
+### Custom
+
+- Custom Providers
+
+---
+
+# Integration with Existing Systems
+Designed to integrate seamlessly with existing Go libraries: [Gorilla mux](https://github.com/gorilla/mux), [Go-chi](https://github.com/go-chi/chi), [Echo](https://github.com/labstack/echo) and [Gin](https://github.com/gin-gonic/gin).
+
+| Framework | Supported |
+|-----------|:---------:|
+| net/http | ✅ |
+| Gin | ✅ |
+| Echo | ✅ |
+
+Samples:
+  - [handler](https://github.com/core-go/health/blob/main/handler.go), to support [Gorilla mux](https://github.com/gorilla/mux) and [Go-chi](https://github.com/go-chi/chi). The sample is at [go-sql-sample](https://github.com/go-tutorials/go-sql-sample).
+  - [echo handler](https://github.com/core-go/health/blob/main/echo/handler.go) to support [Echo](https://github.com/labstack/echo). The sample is at [go-sql-echo-sample](https://github.com/go-tutorials/go-sql-echo-sample).
+  - [gin handler](https://github.com/core-go/health/blob/main/gin/handler.go) to support [Gin](https://github.com/gin-gonic/gin). The sample is at [go-sql-gin-sample](https://github.com/go-tutorials/go-sql-gin-sample).
+
+### net/http
+
+```go
+http.Handle("/health", health.NewHandler(checker))
+```
+
+### Gin
+
+```go
+router.GET("/health", healthgin.NewHandler(checker))
+```
+
+### Echo
+
+```go
+e.GET("/health", healthecho.NewHandler(checker))
+```
+
+Using another framework?
+
+Simply invoke the health checker and write the response using your preferred framework.
+
+---
+
+# Configurable Timeout
+
+A slow dependency should never block your health endpoint.
+
+Since Kubernetes typically invokes health endpoints every few seconds, every provider supports its own timeout.
+
+```go
+health.Add(
+    kafka.NewChecker(
+        producer,
+        4*time.Second,
+    ),
+)
+```
+
+or
+
+```go
+health.Add(
+    http.NewChecker(
+        "User Service",
+        "https://user-service/health",
+        4*time.Second,
+    ),
+)
+```
+
+Benefits:
+
+- Prevent hanging health requests
+- Detect slow or unreachable services
+- Keep Kubernetes probes responsive
+- Configure different timeout values for different providers
+
+---
+
+# Example
+
+```go
+checker := health.New()
+
+checker.Add(sql.New(database))
+checker.Add(redis.New(redisClient))
+checker.Add(kafka.New(producer))
+checker.Add(elasticsearch.New(client))
+checker.Add(http.New(
+    "User Service",
+    "https://user-service/health",
+))
+
+http.Handle("/health", health.NewHandler(checker))
+```
+
+---
+
+# Example Response
+
+Everything is healthy:
+
+```json
+{
+    "status": "UP",
+    "services": [
+        {
+            "name": "database",
+            "status": "UP"
+        },
+        {
+            "name": "redis",
+            "status": "UP"
+        },
+        {
+            "name": "kafka",
+            "status": "UP"
+        }
+    ]
 }
 ```
 
-  - Build the response JSON from many custom health checks by this GO function [Check](https://github.com/core-go/health/blob/main/check.go)
-    - This function can be called by http handler ([gin](https://github.com/gin-gonic/gin), [echo](https://github.com/labstack/echo), [mux](https://github.com/gorilla/mux), [go-chi](https://github.com/go-chi/chi))
-  - Implement basic checks
-    - CPU, memory, disk space: not yet implemented.
-    - Cache (Redis, Memcached)
-    - Databases: [sql](https://github.com/core-go/health/blob/main/sql/health_checker.go), [mongo](https://github.com/core-go/health/blob/main/mongo/health_checker.go), [dynamodb](https://github.com/core-go/health/blob/main/dynamodb/health_checker.go), [firestore](https://github.com/core-go/health/blob/main/firestore/health_checker.go), [elasticsearch](https://github.com/core-go/health/blob/main/elasticsearch/v8/health_checker.go), [cassandra](https://github.com/core-go/health/blob/main/cassandra/health_checker.go), [hive](https://github.com/core-go/health/blob/main/hive/health_checker.go)
-    - Message Queue
-    - External Service Health
-  - Integration with Existing Systems, by supporting these Go libraries: [gin](https://github.com/gin-gonic/gin), [echo](https://github.com/labstack/echo), [mux](https://github.com/gorilla/mux), [go-chi](https://github.com/go-chi/chi)
+Kafka is unavailable:
+
+```json
+{
+    "status": "DOWN",
+    "services": [
+        {
+            "name": "database",
+            "status": "UP"
+        },
+        {
+            "name": "redis",
+            "status": "UP"
+        },
+        {
+            "name": "kafka",
+            "status": "DOWN",
+            "error": "connection refused"
+        }
+    ]
+}
+```
+
+---
+
+# Architecture
+
+```
+                    +-----------------------+
+                    |     Health Checker    |
+                    +-----------------------+
+                               |
+        -----------------------------------------------------
+        |         |         |         |         |            |
+       SQL      Redis     Kafka    RabbitMQ   HTTP   Elasticsearch
+        |         |         |         |         |            |
+        -----------------------------------------------------
+                               |
+                        Health Response
+```
+
+Every provider implements the same interface.
+
+Adding support for a new system only requires implementing a new provider.
+
+---
+
+# Production Use Cases
+
+Perfect for:
+
+- Kubernetes Readiness Probe
+- Kubernetes Liveness Probe
+- Docker Health Check
+- Amazon ECS
+- Google Cloud Run
+- Background Workers
+- Scheduled Jobs
+- REST APIs
+- Microservices
+
+---
+
+# Why core-go/health?
+
+Unlike a simple `/health` endpoint that only checks whether the HTTP server is running, **core-go/health** verifies the health of the infrastructure your application actually depends on.
+
+This enables you to:
+
+- Detect dependency failures immediately
+- Reduce Mean Time To Detect (MTTD)
+- Improve production observability
+- Simplify troubleshooting
+- Standardize health checks across services
+- Reuse the same health framework throughout your organization
+
+---
+
+# Real World Example
+
+A typical microservice may depend on multiple infrastructure components.
+
+```
+Order Service
+    │
+    ├── Oracle
+    ├── Kafka
+    ├── Redis
+    ├── Elasticsearch
+    └── User Service (HTTP)
+```
+
+When Kafka becomes unavailable:
+
+Without **core-go/health**
+
+```
+✓ HTTP Server
+
+/health -> 200 OK
+```
+
+Everything appears healthy.
+
+With **core-go/health**
+
+```
+✓ Oracle
+✓ Redis
+✗ Kafka
+✓ Elasticsearch
+✓ User Service
+
+/health -> DOWN
+```
+
+Your monitoring system immediately identifies the failed dependency, allowing engineers to investigate the correct component instead of spending hours searching for the root cause.
+
+---
+
+# Design Principles
+
+- **Framework Independent** — No dependency on Gin, Echo, or any other web framework.
+- **Provider Based** — Every dependency is implemented as an independent provider.
+- **Extensible** — Easily add custom providers.
+- **Production Ready** — Designed for Kubernetes and cloud-native applications.
+- **Minimal API** — Simple to learn and easy to integrate.
+
+---
+
+# Philosophy
+
+A healthy service is not simply one whose HTTP server is running.
+
+A healthy service is one that can successfully communicate with all of its critical dependencies and continue serving requests.
+
+---
+
+# Examples:
+
 
 #### External Service Health Check Library
 - <b>Purpose</b>: Monitors the availability of external services.
@@ -134,72 +409,9 @@ type Checker interface {
     - [Active MQ](https://github.com/core-go/health/blob/main/activemq/health_checker.go): support [go-stomp](https://github.com/go-stomp/stomp). The sample is at [go-active-mq-sample](https://github.com/project-samples/go-active-mq-sample).
     - [RabbitMQ](https://github.com/core-go/health/blob/main/rabbitmq/health_checker.go): support [rabbitmq/amqp091-go](https://github.com/rabbitmq/amqp091-go). The sample is at [go-rabbit-mq-sample](https://github.com/project-samples/go-rabbit-mq-sample).
     - [IBM MQ](https://github.com/core-go/health/blob/main/ibmmq/health_checker.go): support [ibmmq](https://github.com/ibm-messaging/mq-golang). The sample is at [go-ibm-mq-sample](https://github.com/project-samples/go-ibm-mq-sample).
-  - Monitor message lag and processing time (Not yet implemented)
 
-### Future Libraries to develop
-#### Cluster Health Check Library
-- <b>Purpose</b>: Ensures the health of the microservices cluster.
-- <b>Features</b>:
-  - Check node status, CPU, and memory usage across the cluster.
-  - Integrate with orchestration platforms like Kubernetes for liveness and readiness probes.
-#### Metrics and Monitoring Integration Library
-- <b>Purpose</b>: Integrates health checks with monitoring tools.
-- <b>Features</b>:
-  - Export health check results to monitoring systems (Prometheus, Grafana, ELK stack).
-  - Provide detailed dashboards and alerting mechanisms.
-#### Notification and Alerting Library
-- <b>Purpose</b>: Sends alerts based on health check results.
-- <b>Features</b>:
-  - Integrate with notification systems (Slack, PagerDuty, email).
-  - Provide configurable thresholds and alerting rules.
+---
 
-### Integration with Existing Systems
-- Designed to integrate seamlessly with existing Go libraries: [Gorilla mux](https://github.com/gorilla/mux), [Go-chi](https://github.com/go-chi/chi), [Echo](https://github.com/labstack/echo) and [Gin](https://github.com/gin-gonic/gin).
-  - [handler](https://github.com/core-go/health/blob/main/handler.go), to support [Gorilla mux](https://github.com/gorilla/mux) and [Go-chi](https://github.com/go-chi/chi). The sample is at [go-sql-sample](https://github.com/go-tutorials/go-sql-sample).
-  - [echo handler](https://github.com/core-go/health/blob/main/echo/handler.go) to support [Echo](https://github.com/labstack/echo). The sample is at [go-sql-echo-sample](https://github.com/go-tutorials/go-sql-echo-sample).
-  - [gin handler](https://github.com/core-go/health/blob/main/gin/handler.go) to support [Gin](https://github.com/gin-gonic/gin). The sample is at [go-sql-gin-sample](https://github.com/go-tutorials/go-sql-gin-sample).
+# License
 
-### Benefits and Challenges:
-#### Benefits:
-- Improved Reliability: Continuous monitoring of services ensures quick detection and resolution of issues.
-- Scalability: Supports growth by maintaining health across distributed systems.
-- Better Resource Management: Helps optimize resource usage and prevent failures.
-
-#### Challenges:
-- Overhead: Adding health checks can introduce some performance overhead.
-- Complexity: Requires careful planning and integration to avoid false positives and negatives.
-- Maintenance: Health check implementations need regular updates to stay relevant and effective.
-
-## Appendix
-### Health Check for nodejs
-#### Database Health Check Libraries
-- Redis: [redis-plus](https://www.npmjs.com/package/redis-plus), to support [redis](https://www.npmjs.com/package/redis).
-- Mongo: [mongodb-extension](https://www.npmjs.com/package/mongodb-extension), to support [mongodb](https://www.npmjs.com/package/mongodb). The sample is at [mongo-modular-sample](https://github.com/source-code-template/mongo-modular-sample).
-- My SQL: [mysql2-core](https://www.npmjs.com/package/mysql2-core), to support [mysql2](https://www.npmjs.com/package/mysql2). The sample is at [sql-modular-sample](https://github.com/source-code-template/sql-modular-sample).
-- Oracle: [oracle-core](https://www.npmjs.com/package/oracle-core), to support [oracledb](https://www.npmjs.com/package/oracledb).
-- Postgres: [pg-extension](https://www.npmjs.com/package/pg-extension), to support [pg](https://www.npmjs.com/package/pg).
-- MS SQL: [mssql-core](https://www.npmjs.com/package/mssql-core), to support [mssql](https://www.npmjs.com/package/mssql).
-- SQLite: [sqlite3-core](https://www.npmjs.com/package/sqlite3-core) to support [sqlite3](https://www.npmjs.com/package/sqlite3).
-
-#### Message Queue Health Check Libraries
-- Kafka: [kafka-plus](https://www.npmjs.com/package/kafka-plus), to support [kafkajs](https://www.npmjs.com/package/kafkajs). The sample is at [kafka-sample](https://github.com/typescript-tutorial/kafka-sample).
-- RabbitMQ: [rabbitmq-ext](https://www.npmjs.com/package/rabbitmq-ext), to support [amqplib](https://www.npmjs.com/package/amqplib). The sample is at [rabbitmq-sample](https://github.com/typescript-tutorial/rabbitmq-sample).
-- Google Pub/Sub: [google-pubsub](https://www.npmjs.com/package/google-pubsub), to support [@google-cloud/pubsub](https://www.npmjs.com/package/@google-cloud/pubsub). The sample is at [pubsub-sample](https://github.com/typescript-tutorial/pubsub-sample)
-- IBM MQ: [ibmmq-plus](https://www.npmjs.com/package/ibmmq-plus), to support [ibmmq](https://www.npmjs.com/package/ibmmq). The sample is at [ibmmq-sample](https://github.com/typescript-tutorial/ibmmq-sample).
-- Active MQ: [activemq](https://www.npmjs.com/package/activemq), to support [amqplib](https://www.npmjs.com/package/amqplib). The sample is at [activemq-sample](https://github.com/typescript-tutorial/activemq-sample).
-- NATS: [nats-plus](https://www.npmjs.com/package/nats-plus), to support [nats](https://www.npmjs.com/package/nats). The sample is at [nats-sample](https://github.com/typescript-tutorial/nats-sample).
-
-#### Integration with Existing Systems
-- for nodejs, we have [express-ext](https://www.npmjs.com/package/express-ext) to integrate with [express](https://www.npmjs.com/package/express). The sample is at  is at [mongo-modular-sample](https://github.com/source-code-template/mongo-modular-sample).
-
-## Installation
-Please make sure to initialize a Go module before installing core-go/health:
-
-```shell
-go get -u github.com/core-go/health
-```
-
-Import:
-```go
-import "github.com/core-go/health"
-```
+MIT
